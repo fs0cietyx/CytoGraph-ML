@@ -2,6 +2,7 @@
 
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![ML Pipeline](https://img.shields.io/badge/ML--Pipeline-Scikit--learn-orange.svg)](https://scikit-learn.org/)
+[![CI Pipeline](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/ci.yml/badge.svg)](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > **An enterprise-grade bioinformatics suite for high-dimensional genomic classification, achieving 99.53% accuracy on the TCGA PANCAN dataset.**
