@@ -23,6 +23,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Prepare Mock Data & Directories
+      run: |
+        mkdir -p data models results
+        echo "id,gene_1,gene_2" > data/data.csv
+        echo "1,1.0,2.0" >> data/data.csv
+        echo "2,5.0,2.0" >> data/data.csv
+        echo "id,label" > data/labels.csv
+        echo "1,BRCA" >> data/labels.csv
+        echo "2,LUAD" >> data/labels.csv
+
     - name: Run Tests
       run: |
         pytest tests/ --html=report.html --self-contained-html

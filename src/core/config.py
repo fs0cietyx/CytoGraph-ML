@@ -6,8 +6,8 @@ from pydantic import BaseModel, Field
 class PipelineConfig(BaseModel):
     """Configuration schema for the Cancer Growth Prediction Pipeline."""
     
-    # Paths
-    BASE_DIR: Path = Path("/Users/mainakbiswas/Documents/AI_Vault/cancer-cell-growth-prediction")
+    # Paths discovery: Dynamically locate the project root
+    BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
     DATA_DIR: Path = BASE_DIR / "data"
     MODEL_DIR: Path = BASE_DIR / "models"
     RESULTS_DIR: Path = BASE_DIR / "results"
