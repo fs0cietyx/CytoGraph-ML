@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  apex-api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+      - ./results:/app/results
+      - ./data:/app/data
+    environment:
+      - RANDOM_STATE=42
+    restart: always

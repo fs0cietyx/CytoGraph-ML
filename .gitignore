@@ -1,0 +1,26 @@
+# Virtual Environment
+venv/
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# OS specific
+.DS_Store
+
+# Large Data Files (Suggest downloading from UCI Repo instead)
+data/
+
+# Model Artifacts (Keeping joblib for portability, but ignoring if they grow too large)
+# models/
