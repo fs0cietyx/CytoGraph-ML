@@ -10,7 +10,7 @@
 
 ## 🌟 Overview
 
-The **APEX Protocol** is a specialized machine learning framework designed to bridge the gap between raw genomic data and clinical insight. Originally developed to identify transcription factors driving cancer progression, this suite provides an end-to-end pipeline—from automated data ingestion and zero-leakage preprocessing to biological pathway mapping.
+The **APEX Protocol** is a specialized machine learning framework designed to bridge the gap between raw genomic data and clinical insight. Originally developed to identify transcription factors driving cancer progression, this suite provides an end-to-end pipeline-from automated data ingestion and zero-leakage preprocessing to biological pathway mapping.
 
 ### 🎯 Real-Life Impact
 *   **Early Diagnosis:** Automates the classification of cancer types with near-perfect precision, reducing diagnostic lag.
