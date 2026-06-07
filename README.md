@@ -27,7 +27,7 @@ The suite is built on a **Modular OOP Architecture**, ensuring that each stage o
 ```mermaid
 graph TD
     A[Raw Genomic Data] --> B[BioDataLoader]
-    B --> C{APEX Pipeline}
+    B --> C{Genomic Pipeline}
     subgraph "Core ML Engine"
     C --> D[Median Imputer]
     D --> E[Robust Scaler]
@@ -139,3 +139,4 @@ This project is part of a research effort into automated bioinformatics. Contrib
 **Author:** [Mainak Biswas/fs0cietyx]  
 **Contact:** [www.instagram.com/fushigurp]  
 **Project Status:** `Fully Operational`
+tional`
