@@ -140,4 +140,3 @@ This project is part of a research effort into automated bioinformatics. Contrib
 **Author:** [Mainak Biswas/fs0cietyx]  
 **Contact:** [www.instagram.com/fushigurp]  
 **Project Status:** `Fully Operational`
-tional`
