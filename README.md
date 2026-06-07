@@ -1,4 +1,4 @@
-# 🧬 APEX Protocol: Cancer Cell Growth Prediction Suite
+# 🧬 Cancer Cell Growth Prediction Suite
 
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![ML Pipeline](https://img.shields.io/badge/ML--Pipeline-Scikit--learn-orange.svg)](https://scikit-learn.org/)
@@ -135,6 +135,6 @@ docker-compose up --build
 This project is part of a research effort into automated bioinformatics. Contributions involving **Deep Learning benchmarks** or **Expanded Pathway Mappings** are welcome. 
 
 ---
-**Author:** [Your Name/Profile]  
-**Contact:** [Your Email/LinkedIn]  
-**Project Status:** `Fully Operational / Enterprise Ready`
+**Author:** [Mainak Biswas/fs0cietyx]  
+**Contact:** [www.instagram.com/fushigurp]  
+**Project Status:** `Fully Operational`
