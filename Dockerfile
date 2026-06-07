@@ -1,4 +1,4 @@
-# APEX Protocol: Enterprise Docker Container
+# CytoGraph-ML: Enterprise Genomic Classification Container
 FROM python:3.11-slim
 
 # Set environment variables

@@ -1,17 +1,18 @@
-# 🧬 Cancer Cell Growth Prediction Suite
+# 🧬 CytoGraph-ML: Cancer Cell Growth Prediction Suite
 
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![ML Pipeline](https://img.shields.io/badge/ML--Pipeline-Scikit--learn-orange.svg)](https://scikit-learn.org/)
 [![CI Pipeline](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/ci.yml/badge.svg)](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/ci.yml)
+[![Docker Build CI](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/docker-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **An enterprise-grade bioinformatics suite for high-dimensional genomic classification, achieving 99.53% accuracy on the TCGA PANCAN dataset.**
+> **A professional bioinformatics suite for high-dimensional genomic classification, achieving 99.53% accuracy on the TCGA PANCAN dataset.**
 
 ---
 
 ## 🌟 Overview
 
-The **APEX Protocol** is a specialized machine learning framework designed to bridge the gap between raw genomic data and clinical insight. Originally developed to identify transcription factors driving cancer progression, this suite provides an end-to-end pipeline-from automated data ingestion and zero-leakage preprocessing to biological pathway mapping.
+**CytoGraph-ML** is a specialized machine learning framework designed to bridge the gap between raw genomic data and clinical insight. Originally developed to identify transcription factors driving cancer progression, this suite provides an end-to-end pipeline—from automated data ingestion and zero-leakage preprocessing to biological pathway mapping.
 
 ### 🎯 Real-Life Impact
 *   **Early Diagnosis:** Automates the classification of cancer types with near-perfect precision, reducing diagnostic lag.
