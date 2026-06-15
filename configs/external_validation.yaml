@@ -1,0 +1,14 @@
+feature_count: 150
+classifier:
+  type: RandomForest
+  n_estimators: 100
+  max_features: "sqrt"
+  n_jobs: -1
+  class_weight:
+    0: 1
+    1: 5
+cv:
+  folds: 5
+  test_size: 0.3
+random_seed: 42
+variance_threshold: 0.01

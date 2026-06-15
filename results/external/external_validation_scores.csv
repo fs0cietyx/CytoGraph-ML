@@ -1,0 +1,3 @@
+Cohort,Platform,Accuracy,Recall,ROC-AUC
+GSE19804 (Lung),GPL570,93.33%,0.9167,0.9736
+GSE21510 (Colorectal),GPL570,83.11%,1.0000,N/A

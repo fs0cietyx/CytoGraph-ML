@@ -17,3 +17,7 @@ pytest
 pytest-html
 requests
 mygene
+GEOparse
+xgboost
+lightgbm
+tabulate

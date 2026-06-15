@@ -1,0 +1,3 @@
+from src.pipelines.lung_pipeline import create_lung_pipeline
+from src.pipelines.colorectal_pipeline import create_colorectal_pipeline
+from src.pipelines.production_pipeline import create_production_pipeline

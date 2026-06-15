@@ -1,0 +1,2 @@
+Metric,Baseline Accuracy,Permuted Mean Accuracy,Permuted Std Accuracy,Empirical p-value
+Permutation Audit,100.00%,53.70%,6.70%,0.0000

@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this framework, please cite the paper below."
+authors:
+  - family-names: Biswas
+    given-names: Mainak
+title: "CytoGraph-ML: Leakage-aware explainable machine learning framework for transcriptomic cancer classification"
+version: 1.0.0
+date-released: 2026-06-15
+url: "https://github.com/mainakbiswas/cytograph-ml"
