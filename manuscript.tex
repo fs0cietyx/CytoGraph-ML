@@ -872,6 +872,42 @@ x^{\text{norm}}_j = M_{\text{rank}(x_j)}
 \end{equation}
 This ensures that incoming samples are aligned to the exact scale the model was trained on, preventing platform-specific scaling shifts from corrupting real-time classification.
 
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=0.6cm]
+    \node (req) [io] {HTTP JSON Request \\ (samples: List[Dict])};
+    \node (api) [process, below=of req] {FastAPI /predict Endpoint};
+    \node (align) [process, below=of api] {Feature Alignment \\ (Reindex on research\_features)};
+    \node (pipe) [process, below=of align] {Pipeline Inference \\ (Impute, Scale, Predict)};
+    \node (bio) [process, below=of pipe] {BioMapper Enrichment \\ (MyGene.info API Query)};
+    \node (resp) [io, below=of bio] {HTTP JSON Response \\ (predictions + confidence + biology)};
+    
+    \draw [arrow] (req) -- (api);
+    \draw [arrow] (api) -- (align);
+    \draw [arrow] (align) -- (pipe);
+    \draw [arrow] (pipe) -- (bio);
+    \draw [arrow] (bio) -- (resp);
+\end{tikzpicture}
+\caption{Architectural flowchart of the FastAPI inference and biological enrichment service.}
+\label{fig:api_architecture}
+\end{figure}
+
+\begin{table*}[htbp]
+\centering
+\caption{FastAPI Endpoint Routing and JSON Schema Mappings}
+\label{tab:api_endpoints}
+\begin{tabular}{llllp{6.5cm}}
+\toprule
+\textbf{Endpoint} & \textbf{Method} & \textbf{Input Schema Class} & \textbf{Output Schema Class} & \textbf{JSON Payload Structure} \\
+\midrule
+/health & GET & None & Dict & \texttt{\{"status": "healthy", "pipeline\_loaded": true\}} \\
+\midrule
+/predict & POST & InferenceRequest & PredictionResponse & Request: \texttt{\{"samples": [\{"LDB2": 1.2, "SLIT3": 0.8, \dots\}]\}} \\
+         &      &                  &                    & Response: \texttt{\{"results": [\{"prediction": "1", "confidence": 0.95, "biological\_insight": \{\dots\}\}], "status": "success"\}} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
 \subsection{Tumor Microenvironment and Deconvolution}
 A biological limitation of bulk transcriptomics is that expression levels represent the tissue average across a complex mixture of tumor, stromal, and infiltrating immune cells. Stromal contamination can significantly mask tumor-specific signatures. To address this, clinical models must integrate deconvolution algorithms like CIBERSORT~\cite{newman} or xCell to estimate cell-type fractions:
 \begin{equation}
