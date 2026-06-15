@@ -201,6 +201,16 @@ In the spirit of rigorous science, we acknowledge the following limitations:
 
 ---
 
+## ⚠️ Clinical Disclaimer
+
+**FOR RESEARCH USE ONLY (RUO). NOT FOR USE IN DIAGNOSTIC PROCEDURES.**
+
+CytoGraph-ML is a scientific research prototype designed to study the generalizability of machine learning models under batch-effect platform shifts. It has not been analytically validated, clinically validated, or cleared/approved by the US Food and Drug Administration (FDA) or any other regulatory body. 
+
+Under no circumstances should this software, its API endpoints, or its predictions be used to diagnose, treat, cure, or monitor any patient. The author(s) assume no liability or responsibility for clinical outcomes or diagnostic routing decisions made using this code.
+
+---
+
 ## 🤝 Citation & Contact
 
 This repository serves as the official codebase for the manuscript: 
