@@ -218,17 +218,50 @@ To prevent patient-level data leakage (where paired normal and tumor samples fro
 To ensure statistical integrity, we implemented an isolated preprocessing pipeline using \texttt{sklearn.pipeline.Pipeline}. Preprocessing parameters (such as feature means, medians, and selected sets) were computed exclusively from the active training folds during cross-validation. The steps are defined as follows:
 
 \subsubsection{Cross-Study Quantile Normalization}
-High-throughput transcriptomic datasets generated across different labs and equipment exhibit significant systematic shifts (batch effects). To align the distribution of the source and target datasets, we applied rank-based Quantile Normalization. Let $X_{\text{source}}$ and $X_{\text{target}}$ represent the expression matrices. The normalization operator aligns distributions by mapping ranks to target quantiles:
-\begin{equation}
-X_{\text{normalized}} = F_{\text{target}}^{-1}\left(F_{\text{source}}(X)\right)
-\end{equation}
-where $F(\cdot)$ represents the empirical cumulative distribution function, mathematically removing baseline equipment variation.
+High-throughput transcriptomic datasets generated across different labs and equipment exhibit significant systematic shifts (batch effects). To align the distribution of different datasets, we applied rank-based Quantile Normalization. Mathematically, let $X \in \mathbb{R}^{N \times P}$ represent the expression matrix, where rows represent samples and columns represent genes. The discrete normalization algorithm proceeds as follows:
+\begin{enumerate}
+    \item \textbf{Rank Assignment:} Let $R_{i,j}$ be the rank of expression value $X_{i,j}$ within gene column $j$ across all samples:
+    \begin{equation}
+    R_{i,j} = \text{rank}(X_{i,j}) \in \{1, 2, \dots, N\}
+    \end{equation}
+    \item \textbf{Sorting and Mean Calculation:} Sort each gene column in ascending order, obtaining $S_{r,j}$ as the value at sorted position $r$ for gene $j$. Compute the average value at each sorted position across all $P$ genes:
+    \begin{equation}
+    M_r = \frac{1}{P} \sum_{j=1}^P S_{r,j} \quad \text{for } r = 1, 2, \dots, N
+    \end{equation}
+    \item \textbf{Re-mapping values:} Reconstruct the normalized matrix $X^{\text{norm}}$ by replacing each original expression value with the rank-mean value:
+    \begin{equation}
+    X^{\text{norm}}_{i,j} = M_{R_{i,j}}
+    \end{equation}
+\end{enumerate}
+This standardizes the global distribution of expression values across all samples, removing technical batch and platform variations.
 
 \subsubsection{Biological Proxy Filtering}
-A major pitfall in transcriptomic classifiers is identifying non-specific downstream stromal or inflammation markers (e.g., blood vessels, inflammation response) that reflect tissue damage rather than oncogenic mutations. To force the classifier to learn core genomic drivers, we implemented a Biological Proxy Filter that blacklists 14 general stroma, endothelial, and inflammation genes prior to feature selection:
+A major pitfall in transcriptomic classifiers is identifying non-specific downstream stromal or inflammatory markers (e.g., blood vessels, inflammation response) that reflect tissue structure or injury rather than oncogenic drivers. If these features remain, the classifier learns to predict cancer presence simply by detecting increased vascularization or immune cell infiltration. To force the classifier to learn core cancer-cell autonomous genomic drivers, we blacklisted 14 general stroma, endothelial, and inflammation genes prior to feature selection:
 \begin{equation}
 D_{\text{filtered}} = D_{\text{raw}} \setminus \{VWF, PECAM1, CD34, ENG, CDH5, IL6, TNF, CRP, CCL2, IL8, ACTB, GAPDH, B2M, ALB\}
 \end{equation}
+
+Table~\ref{tab:blacklist_genes} outlines the biological justification for blacklisting these genes.
+
+\begin{table}[htbp]
+\centering
+\caption{Biological Roles of Blacklisted Proxy Genes}
+\label{tab:blacklist_genes}
+\begin{tabular}{lll}
+\toprule
+\textbf{Gene Class} & \textbf{HGNC Symbols} & \textbf{Stroma/Inflammatory Role} \\
+\midrule
+Endothelial Markers & VWF, PECAM1, CD34, & Represents blood vessel density \\
+                    & ENG, CDH5          & (angiogenesis) in stroma. \\
+\midrule
+Inflammatory        & IL6, TNF, CRP,     & Represents host immune response \\
+Cytokines           & CCL2, IL8          & and inflammation. \\
+\midrule
+Housekeeping /      & ACTB, GAPDH,       & Represents general cell structure \\
+Structural          & B2M, ALB           & and metabolic housekeeping. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsubsection{Mutual Information Feature Selection}
 RNA expression values violate standard Gaussian assumptions. We utilized a non-parametric feature selection method based on Mutual Information (MI) to capture non-linear, high-dimensional epistasis:
@@ -272,14 +305,19 @@ Random Forest & Number of Estimators & 100 \\
 \end{tabular}
 \end{table}
 
-The production model is a bagging ensemble composed of $B = 100$ decision trees. In clinical diagnostics, missing a cancer diagnosis (a False Negative) is significantly more detrimental than a False Positive. To prioritize clinical safety, we adjusted class weights to 5:1 (penalizing tumor classification errors 5x higher). Aggregate tree predictions are resolved by majority voting:
+The production model is a bagging ensemble composed of $B = 100$ decision trees. In clinical diagnostics, missing a cancer diagnosis (a False Negative) is significantly more detrimental than a False Positive. To prioritize clinical safety, we adjusted class weights to 5:1 (penalizing tumor classification errors 5x higher). During tree training, this weight modifies the sample impurity calculations at split node $t$. The weighted proportion of class $k \in \{0, 1\}$ at node $t$ is defined as:
 \begin{equation}
-\hat{y}(x) = \text{argmax}_{k \in \{0, 1\}} \sum_{b=1}^B w_k \mathbb{I}(\hat{y}_b(x) = k)
+p_k = \frac{\sum_{i \in \text{node } t} w_{y_i} \mathbb{I}(y_i = k)}{\sum_{i \in \text{node } t} w_{y_i}}
 \end{equation}
-where $w_1 = 5.0$ (Tumor) and $w_0 = 1.0$ (Normal). Gini impurity at split node $t$ is calculated via:
+where $w_1 = 5.0$ (Tumor) and $w_0 = 1.0$ (Normal). The Gini impurity at node $t$ is then:
 \begin{equation}
 I_G(t) = 1 - \sum_{k=0}^1 p_k^2
 \end{equation}
+During inference, each individual tree $b$ predicts a probability distribution. The final prediction $\hat{y}(x)$ of the Random Forest resolves by aggregating the weighted votes across all $B$ trees:
+\begin{equation}
+\hat{y}(x) = \text{argmax}_{k \in \{0, 1\}} \sum_{b=1}^B w_k \mathbb{I}(\hat{y}_b(x) = k)
+\end{equation}
+This mathematical adjustment shifts the model's decision threshold, prioritizing sensitivity over specificity.
 
 \subsection{Game-Theoretic Interpretability (SHAP) and TreeSHAP Optimization}
 To explain the decisions of the Random Forest model, we computed SHAP values based on the cooperative game-theoretic formulation:
@@ -786,6 +824,17 @@ We provide a patient-specific SHAP force plot schematic in Figure~\ref{fig:shap_
 \end{figure}
 
 For instance, if a patient is diagnosed with a tumor and the model indicates that \textit{LDB2} silencing was the primary driving feature, the clinician receives immediate, actionable information: the tumor has lost a key transcriptional suppressor, which might suggest a more aggressive phenotype. This biological insight can assist in designing targeted therapies or close monitoring.
+
+\subsection{The Inference Gap: Batch Effects in Real-Time API Deployment}
+A critical challenge in translating machine learning models from computational biology papers to clinical software is the "Inference Gap" regarding technical batch effects. During model training and cohort-level validation, rank-based Quantile Normalization aligns distributions by sorting and averaging values across a group of samples. However, in a real-time clinical deployment (such as the FastAPI endpoint `/predict` implemented in our inference service), predictions are requested on a single sample $x \in \mathbb{R}^P$ in isolation.
+
+A single sample lacks a cohort distribution from which to calculate ranks or averages. If raw, un-normalized expression values are sent directly to the API, systematic variations in scaling across different labs or platforms will cause feature values to shift. Under our clinical safety constraint (5:1 tumor class weight), even a slight baseline shift towards tumor-like patterns will cause the model to default to predicting a tumor diagnosis. This explains the result in our independent cohort "Acid Test" (GSE19804), where a platform shift (GPL96 to GPL570) caused the model to classify almost all samples ($119$ out of $120$) as Tumor, yielding $50.83\%$ accuracy and a perfect $1.0000$ Sensitivity.
+
+To resolve the Inference Gap, a real-world deployment must implement Reference-Based Quantile Normalization (R-QN). Instead of normalizing a sample against a target cohort, the single sample is normalized against the frozen reference distribution of the training set. Let $M_r$ represent the sorted mean values of the training cohort at each rank $r \in \{1, 2, \dots, N_{\text{train}}\}$. The single sample's expression values are ranked and linearly interpolated to align with the training cohort's quantiles:
+\begin{equation}
+x^{\text{norm}}_j = M_{\text{rank}(x_j)}
+\end{equation}
+This ensures that incoming samples are aligned to the exact scale the model was trained on, preventing platform-specific scaling shifts from corrupting real-time classification.
 
 \subsection{Tumor Microenvironment and Deconvolution}
 A biological limitation of bulk transcriptomics is that expression levels represent the tissue average across a complex mixture of tumor, stromal, and infiltrating immune cells. Stromal contamination can significantly mask tumor-specific signatures. To address this, clinical models must integrate deconvolution algorithms like CIBERSORT~\cite{newman} or xCell to estimate cell-type fractions:
