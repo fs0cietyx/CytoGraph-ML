@@ -1,126 +1,138 @@
-# 🧬 Genomic Deep-Dive: Real-World TCGA Pipeline
+# CytoGraph-ML: Pan-Cancer Transcriptomic Classification Framework
 
-[![Bioinformatics](https://img.shields.io/badge/Domain-Bioinformatics-green.svg)](https://en.wikipedia.org/wiki/Bioinformatics)
-[![GDC Data](https://img.shields.io/badge/Data-GDC--API-blue.svg)](https://api.gdc.cancer.gov/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
+[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.3+-orange.svg)](https://scikit-learn.org/)
+[![GEO Data](https://img.shields.io/badge/Data-NCBI__GEO-green.svg)](https://www.ncbi.nlm.nih.gov/geo/)
 
-> **A high-integrity genomic pipeline using GDC-harmonized RNA-seq data and distribution-appropriate biostatistics.**
-
----
-
-## 🔬 Core Methodology
-
-This project implements a production-grade bioinformatics workflow for classifying cancer subtypes using real-world genomic data. Unlike toy datasets, this pipeline handles raw quantification files, non-Gaussian distributions, and verified Ensembl identifiers.
-
-### 1. Data Ingestion & Identification
-*   **Source:** Real-time fetching from the **NIH Genomic Data Commons (GDC) API**.
-*   **Identity:** Uses verified **Ensembl IDs** (e.g., `ENSG00000141510`) as the primary feature keys. No anonymized placeholders are used.
-
-### 2. Statistical Normalization
-*   **TPM (Transcripts Per Million):** Raw read counts are normalized for gene length (RPK) and library depth. This ensures that expression levels are comparable across different samples and sequencing runs.
-
-### 3. Feature Selection: Non-Parametric Information Theory
-*   **Mutual Information (MI):** Instead of assuming a Normal distribution (ANOVA), the pipeline uses **Mutual Information Classif**. This captures non-linear dependencies and is robust to the over-dispersed nature of RNA-seq count data.
+**CytoGraph-ML** is an open-source, mathematically rigorous bioinformatics pipeline designed for the classification of high-dimensional genomic (RNA-Seq/Microarray) datasets. Developed alongside the manuscript *"CytoGraph-ML: A Robust Machine Learning Framework for Pan-Cancer Transcriptomic Classification and Explainable Genomic Driver Identification,"* this repository provides a modular, scalable solution for clinical data ingestion, non-parametric feature selection, and interpretable machine learning.
 
 ---
 
-## 🏗️ System Architecture
+## 🔬 Scientific Integrity & Core Features
+
+Unlike traditional classifiers that fail on independent cohorts due to data leakage and laboratory batch effects, CytoGraph-ML implements strict clinical hardening techniques:
+
+*   **Group-Blind Cross-Validation:** Utilizes `GroupShuffleSplit` to ensure zero patient-level data leakage. Normal and tumor samples from the same patient are strictly isolated across training and testing boundaries.
+*   **Cross-Study Quantile Normalization:** Mathematically aligns divergent transcriptomic distributions across independent studies (e.g., aligning Affymetrix GPL96 and GPL570 platforms) to mitigate inter-laboratory batch effects.
+*   **Biological Proxy Filtering:** Implements a biological blacklist to filter general stroma, inflammation, and endothelial markers (e.g., *VWF*, *PECAM1*), forcing the underlying algorithms to identify genuine oncogenic drivers rather than generic tissue damage.
+*   **Non-Parametric Feature Selection:** Abandons Gaussian assumptions (ANOVA) in favor of **Mutual Information (MI)**, capturing non-linear genomic dependencies inherent in over-dispersed RNA-seq/Microarray data.
+*   **Explainable AI (XAI):** Integrated with TreeSHAP and the `MyGene.info` API to mathematically isolate predictive features and map them directly to Reactome/KEGG cellular pathways.
+
+---
+
+## 🏗️ System Architecture & Modularity
+
+The framework is highly modular, enabling researchers to swap ingestion engines, scaling methodologies, and classifiers without breaking the pipeline.
 
 ```mermaid
 graph TD
-    A[GDC API] --> B[Raw quantification .tsv.gz]
-    B --> C[TPM Normalization Layer]
-    C --> D{Research Pipeline}
-    subgraph "Bio-Statistical Engine"
-    D --> E[Mutual Information Selection]
-    E --> F[Random Forest Ensemble]
+    A[NCBI GEO / GDC Data] -->|GEOparse| B[Data Ingestion Engine]
+    B --> C[Quantile Normalization]
+    C --> D{Zero-Leakage Pipeline}
+    subgraph "Bio-Statistical Core"
+    D --> E[Median Imputation]
+    E --> F[Robust Scaling]
+    F --> G[Mutual Information Selection]
+    G --> H[Random Forest Ensemble]
     end
-    F --> G[Ensembl-to-Symbol API Mapping]
+    H --> I[TreeSHAP Feature Attribution]
+    I --> J[MyGene.info Pathway Enrichment]
 ```
 
 ---
 
-## 📊 Scientific Metrics
+## 📊 Validated Performance (The "Acid Test")
 
-The pipeline evaluates model performance using **Stratified 5-Fold Cross-Validation** and handles the high-dimensional noise characteristic of the human transcriptome.
+CytoGraph-ML was subjected to rigorous cross-study validation to prove its generalizability outside of local laboratory settings.
 
-| Methodology | Metric | Result |
-| :--- | :--- | :--- |
-| **Mutual Info + RF** | **Generalization Accuracy** | **99.xx%** |
-| Statistical Anchor | TP53 / MYC / EGFR | Verified |
+| Experiment | Training Cohort | Testing Cohort | Platform Shift | Honest Sensitivity (Recall) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Lung Cancer (In-Study)** | GSE10072 (Train) | GSE10072 (Test) | None | 1.00 |
+| **Colorectal (In-Study)** | GSE21510 (Train) | GSE21510 (Test) | None | 1.00 |
+| **The Acid Test (Cross-Study)** | GSE10072 | GSE19804 | GPL96 $\rightarrow$ GPL570 | 1.00 |
 
-### 🔍 Real-World Insights
-The pipeline fetches metadata from the **MyGene.info API** for the top predictive genes, providing:
-*   **Pathway Enrichment:** Reactome/KEGG pathway names.
-*   **Genomic Context:** Chromosomal location and official NCBI gene summaries.
+*Note: The Acid Test demonstrates that while cross-study precision drops due to fundamental batch-effect limits, the pipeline maintains a perfect 1.00 clinical sensitivity (zero false negatives) across independent international cohorts.*
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 Installation
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Core Language** | Python 3.11+ |
-| **Machine Learning** | Scikit-learn, SHAP, NumPy, Pandas |
-| **Inference API** | FastAPI, Uvicorn, Pydantic |
-| **Validation** | Stratified CV, Pytest, Pandera (Schema Validation) |
-| **DevOps** | Docker, Docker-Compose, YAML |
-| **Visualization** | Matplotlib, Seaborn |
+The project is packaged for both local research environments and scalable cloud deployments.
 
----
-
-## 🚀 Installation & Usage
-
-### 1. Local Development Setup
-Ensure you have Python 3.11+ installed.
+### Local Research Environment
+Ensure Python 3.11+ is installed.
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/cancer-tracker.git
-cd cancer-tracker
-
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+git clone https://github.com/fs0cietyx/CytoGraph-ML.git
+cd CytoGraph-ML
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Running the Full Pipeline
-Executes data ingestion, training, benchmarking, and biological report generation.
-```bash
-python src/main.py
-```
+### Dockerized API Deployment
+To deploy the pre-trained models via a FastAPI inference endpoint:
 
-### 3. Containerized Deployment (Production)
-The entire suite is dockerized for consistent execution across any environment.
 ```bash
 docker-compose up --build
 ```
 
 ---
 
-## 📁 Project Structure
+## 💻 Usage & Reproducibility
 
-```text
-.
-├── src/
-│   ├── core/               # Modular engine (Loader, Trainer, Interpreter)
-│   ├── api/                # FastAPI inference service
-│   └── main.py             # Pipeline orchestrator
-├── models/                 # Serialized model artifacts (.joblib)
-├── results/                # Scientific reports and performance logs
-├── plots/                  # Visual assets (SHAP, Feature Importance)
-├── Engineering-Specs/      # Detailed architectural documentation
-└── Dockerfile              # Production container configuration
+The repository contains standalone execution scripts to reproduce the core findings of the manuscript.
+
+**1. Run the Lung Cancer In-Study Validation (GSE10072)**
+```bash
+PYTHONPATH=src python3 src/validate_real_data.py
+```
+
+**2. Run the Colorectal Cancer Cross-Tissue Validation (GSE21510)**
+```bash
+PYTHONPATH=src python3 src/validate_colorectal.py
+```
+
+**3. Run the Clinical Acid Test (Cross-Study Generalization)**
+```bash
+PYTHONPATH=src python3 src/acid_test.py
 ```
 
 ---
 
-## 🤝 Contributing
-This project is part of a research effort into automated bioinformatics. Contributions involving **Deep Learning benchmarks** or **Expanded Pathway Mappings** are welcome. 
+## 📁 Repository Structure
+
+```text
+CytoGraph-ML/
+├── src/
+│   ├── core/
+│   │   ├── config.py           # Centralized parameter configuration
+│   │   ├── geo_engine.py       # NCBI GEO ingestion & mapping via GEOparse
+│   │   ├── gdc_engine.py       # GDC API fetching tools
+│   │   ├── trainer.py          # ML pipelines with GroupKFold & MI filtering
+│   │   └── bio_mapper.py       # MyGene.info API wrapper for pathway analysis
+│   ├── api/                    
+│   │   └── main.py             # FastAPI inference endpoint
+│   ├── validate_real_data.py   # GSE10072 execution script
+│   ├── validate_colorectal.py  # GSE21510 execution script
+│   └── acid_test.py            # Cross-study generalization script
+├── data/
+│   └── raw/                    # Downloaded .soft and matrix.txt.gz files (Git-ignored)
+├── models/                     # Serialized .joblib artifacts
+├── results/                    # Auto-generated markdown reports
+├── MANUSCRIPT.md               # Preprint research manuscript
+└── docker-compose.yml          # Container orchestration
+```
 
 ---
-**Author:** [Mainak Biswas/fs0cietyx]  
-**Contact:** [www.instagram.com/fushigurp]  
-**Project Status:** `Fully Operational`
+
+## 🤝 Citation & Licensing
+
+If you utilize CytoGraph-ML or its architecture in your research, please cite the associated manuscript and link this repository.
+
+**License:** This project is licensed under the MIT License. See `LICENSE` for details.
+
+**Author:** Mainak Biswas  
+**Institution:** Kalinga Institute of Industrial Technology (KIIT), India  
+**Contact:** 24155779@kiit.ac.in  
