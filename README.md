@@ -1,41 +1,17 @@
 # CytoGraph-ML
-Leakage-aware explainable machine learning framework for transcriptomic cancer classification.
 
-## 🧬 Reproduce Paper
-To replicate all CV scores, external generalizability tests, permutation audits, ablation sweeps, and generate publication-ready figures:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1234567.svg)](https://doi.org/10.5281/zenodo.1234567)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Paper](https://img.shields.io/badge/Paper-Bioinformatics-red.svg)](manuscript.tex)
 
-```bash
-git clone https://github.com/mainakbiswas/cytograph-ml.git
-cd cytograph-ml
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python scripts/reproduce_paper.py
-```
-
-## 📊 Data
-This framework evaluates model robustness across three NCBI Gene Expression Omnibus (GEO) microarrays:
-- **GSE10072**: Primary training cohort (Platform GPL96)
-- **GSE19804**: External validation cohort (Platform GPL570)
-- **GSE21510**: External colorectal tissue shift cohort (Platform GPL570)
-
-## 📈 Results
-- **Expected CV Accuracy:** `97.78%`
-- **Expected External Accuracy:** `50.00%` (Unaligned Baseline) / `85.83%` (Hardened Model)
-
----
-
-## 📖 Executive Summary
-Every cell in the human body contains roughly 20,000 genes. You can think of these genes as "volume dials" on an audio mixer. In healthy cells, the dials are perfectly balanced. In cancer cells, these dials get scrambled—some are turned up dangerously high (promoting rapid cell division), while others are muted (turning off the body's natural defenses). 
-
-Most AI models in genomics suffer from "Lab Bias" (Batch Effects). If an AI is trained on patients from a hospital in New York using one brand of sequencing equipment, it often fails catastrophically when analyzing a patient from a hospital in London using different equipment. The AI accidentally learns the "noise" of the hospital's machines rather than the actual biology of the disease. 
-
-**Our Solution (CytoGraph-ML):** We built a computational pipeline that acts as a universal translator. It mathematically strips away the laboratory noise, filters out generic biological "smoke" (like inflammation), and forces the AI to lock onto the genuine oncogenic "fire."
+CytoGraph-ML implements preprocessing, feature selection, classification, explainability, and cross-cohort validation procedures for transcriptomic cancer classification. It is specifically designed to address cross-platform domain shifts (technical batch effects) and prevent patient-level data leakage inside high-dimensional transcriptomic pipelines.
 
 ---
 
 ## 🛡️ Leakage-Aware Architecture
-Standard linear pipelines leak information when normalization or feature selection is fit globally. CytoGraph-ML uses a strictly segmented fit-transform architecture:
+
+Standard linear pipelines leak information when normalization or feature selection is fit globally. CytoGraph-ML uses a strictly segmented fit-transform architecture to enforce fold-boundary isolation:
 
 ```mermaid
 graph TD
@@ -56,7 +32,48 @@ graph TD
 
 ---
 
+## ⚡ Quick Start
+
+To replicate all cross-validation scores, external validation tests, permutation audits, ablation sweeps, and generate publication-ready figures:
+
+```bash
+# Clone the repository
+git clone https://github.com/fs0cietyx/CytoGraph-ML.git
+cd cytograph-ml
+
+# Set up virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run full reproduction pipeline
+python scripts/reproduce_paper.py
+```
+
+---
+
+## 📊 Data Availability
+
+This framework evaluates model generalizability and batch effect tolerance across three Gene Expression Omnibus (GEO) microarrays:
+- **GSE10072**: Primary training cohort (Platform GPL96)
+- **GSE19804**: External validation cohort (Platform GPL570)
+- **GSE21510**: External colorectal tissue shift cohort (Platform GPL570)
+
+*Note: Raw transcriptomic datasets are not redistributed inside this repository due to licensing and file size. The pipeline automatically ingests local raw files cached under `data/raw/` when reproducing.*
+
+---
+
+## 📈 Expected Results
+
+- **Expected CV Accuracy:** `97.78%`
+- **Expected External Accuracy:** `50.00%` (Unaligned Baseline) / `85.83%` (Domain-Aligned Model)
+
+---
+
 ## 📁 Repository Structure
+
 ```text
 cytograph-ml/
 ├── configs/             # YAML configurations (Never hardcode parameters)
@@ -77,6 +94,23 @@ cytograph-ml/
 ├── figures/             # Final paper-ready figures
 ├── models/              # Serialized joblib pipelines
 └── scripts/             # Entrypoint scripts for paper reproduction
+```
+
+---
+
+## 📖 Citation
+
+If you use this framework or reproduction codebase in your research, please cite:
+
+```bibtex
+@software{biswas2026cytograph,
+  author       = {Mainak Biswas},
+  title        = {CytoGraph-ML: Leakage-aware explainable machine learning framework for transcriptomic cancer classification},
+  year         = {2026},
+  publisher    = {GitHub},
+  journal      = {GitHub Repository},
+  howpublished = {\url{https://github.com/fs0cietyx/CytoGraph-ML}}
+}
 ```
 
 ---
