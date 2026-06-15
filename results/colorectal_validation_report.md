@@ -6,13 +6,13 @@
 ## Identified Colorectal Biomarkers
 | Gene ID | Symbol | Biological Name | Pathway | Summary |
 |---|---|---|---|---|
-| WDR75 | WDR75 | WD repeat domain 75 | rRNA modification in the nucleus and cytosol | Enables RNA binding activity. Involved in positive regulation of rRNA proce... |
-| RP11-503C24.6 | RP11-503C24.6 | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
+| PDE9A | PDE9A | phosphodiesterase 9A | Hemostasis | The protein encoded by this gene catalyzes the hydrolysis of cAMP and cGMP ... |
+| PHOSPHO1 | PHOSPHO1 | phosphoethanolamine/phosphocholine phosphatase 1 | Metabolism | Enables pyrophosphatase activity. Predicted to be involved in bone minerali... |
+| MCL1 | MCL1 | MCL1 apoptosis regulator, BCL2 family member | Cytokine Signaling in Immune system | This gene encodes an anti-apoptotic protein, which is a member of the Bcl-2... |
 | ZNF485 | ZNF485 | zinc finger protein 485 | Generic Transcription Pathway | Predicted to enable DNA-binding transcription activator activity, RNA polym... |
-| CDH3 | CDH3 | cadherin 3 | Cell-Cell communication | This gene encodes a classical cadherin of the cadherin superfamily. Alterna... |
-| ALG11 /// UTP14A /// UTP14C | ALG11 /// UTP14A /// UTP14C | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
-| VAMP2 | VAMP2 | vesicle associated membrane protein 2 | Neurotransmitter release cycle | The protein encoded by this gene is a member of the vesicle-associated memb... |
-| IL6R | IL6R | interleukin 6 receptor | Interleukin-6 signaling | This gene encodes a subunit of the interleukin 6 (IL6) receptor complex. In... |
-| ASUN | ASUN | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
-| CBFB | CBFB | core-binding factor subunit beta | Developmental Biology | The protein encoded by this gene is the beta subunit of a heterodimeric cor... |
-| GLTP | GLTP | glycolipid transfer protein | Transport of small molecules | The protein encoded by this gene is similar to bovine and porcine proteins ... |
+| TAGAP | TAGAP | T cell activation RhoGTPase activating protein | Signal Transduction | This gene encodes a member of the Rho GTPase-activator protein superfamily.... |
+| WDR75 | WDR75 | WD repeat domain 75 | rRNA modification in the nucleus and cytosol | Enables RNA binding activity. Involved in positive regulation of rRNA proce... |
+| KIAA1549 | KIAA1549 | KIAA1549 | Disease | The protein encoded by this gene belongs to the UPF0606 family. This gene h... |
+| CCL14 /// CCL15-CCL14 | CCL14 /// CCL15-CCL14 | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
+| ABHD17A | ABHD17A | abhydrolase domain containing 17A, depalmitoylase | Signal Transduction | Enables palmitoyl-(protein) hydrolase activity. Involved in protein depalmi... |
+| PUS7L | PUS7L | pseudouridine synthase 7 like | Metabolic Homeostasis | Predicted to enable pseudouridine synthase activity. Predicted to be involv... |

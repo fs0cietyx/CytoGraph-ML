@@ -10,13 +10,13 @@
 ## Identified Driver Genes
 | Gene ID | Symbol | Biological Name | Pathway | Summary |
 |---|---|---|---|---|
-| KIAA1462 | KIAA1462 | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
-| TAL1 | TAL1 | TAL bHLH transcription factor 1, erythroid differentiation factor | Developmental Biology | Enables several functions, including DNA-binding transcription factor activ... |
-| TNXA /// TNXB | TNXA /// TNXB | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
-| SLIT3 | SLIT3 | slit guidance ligand 3 | Developmental Biology | The protein encoded by this gene is secreted, likely interacting with round... |
 | LDB2 | LDB2 | LIM domain binding 2 | Signaling Pathway | The protein encoded by this gene belongs to the LIM-domain binding family. ... |
-| TACC1 | TACC1 | transforming acidic coiled-coil containing protein 1 | Signaling Pathway | This locus may represent a breast cancer candidate gene. It is located clos... |
-| AOC3 | AOC3 | amine oxidase copper containing 3 | Metabolism | This gene encodes a member of the semicarbazide-sensitive amine oxidase fam... |
-| TCF21 | TCF21 | transcription factor 21 | Signaling Pathway | TCF21 encodes a transcription factor of the basic helix-loop-helix family. ... |
-| CRYAB | CRYAB | crystallin alpha B | Cellular responses to stress | Mammalian lens crystallins are divided into alpha, beta, and gamma families... |
-| CLEC3B /// EXOSC7 | CLEC3B /// EXOSC7 | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
+| SLIT3 | SLIT3 | slit guidance ligand 3 | Developmental Biology | The protein encoded by this gene is secreted, likely interacting with round... |
+| EPAS1 | EPAS1 | endothelial PAS domain protein 1 | Regulation of gene expression by Hypoxia-inducible Factor | This gene encodes a transcription factor involved in the induction of genes... |
+| KIAA1462 | KIAA1462 | Unknown Biological Marker | Metabolic Homeostasis | Detailed pathway analysis required. |
+| EDNRB | EDNRB | endothelin receptor type B | Developmental Biology | The protein encoded by this gene is a G protein-coupled receptor which acti... |
+| HEG1 | HEG1 | heart development protein with EGF like domains 1 | Metabolic Homeostasis | Predicted to enable calcium ion binding activity. Involved in several proce... |
+| DNASE1L3 | DNASE1L3 | deoxyribonuclease 1L3 | Metabolic Homeostasis | This gene encodes a member of the deoxyribonuclease I family. The encoded p... |
+| NOTCH4 | NOTCH4 | notch receptor 4 | Signaling by NOTCH | This gene encodes a member of the NOTCH family of proteins. Members of this... |
+| ADARB1 | ADARB1 | adenosine deaminase RNA specific B1 | mRNA Editing: A to I Conversion | This gene encodes the enzyme responsible for pre-mRNA editing of the glutam... |
+| CAV2 | CAV2 | caveolin 2 | Signal Transduction | The protein encoded by this gene is a major component of the inner surface ... |
