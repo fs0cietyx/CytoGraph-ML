@@ -1,4 +1,4 @@
-# CytoGraph-ML: Enterprise Genomic Classification Container
+# CytoGraph-ML: Clinical Genomic Classification Container
 FROM public.ecr.aws/docker/library/python:3.11-slim
 
 # Set environment variables
