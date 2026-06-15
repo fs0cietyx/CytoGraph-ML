@@ -737,7 +737,7 @@ Integrating SHAP explainability into CytoGraph-ML provides an operational bridge
     \node (shap) [process, right=of pred] {SHAP Local Attributions};
     
     \node (ldb2) [startstop, below=1.0cm of shap, xshift=-2.6cm] {LDB2 Silencing Detected: Suppressor Loss};
-    \node (slit3) [startstop, height=0.8cm, below=1.0cm of shap, xshift=2.6cm] {High SLIT3 Expression: Angiogenesis};
+    \node (slit3) [startstop, below=1.0cm of shap, xshift=2.6cm] {High SLIT3 Expression: Angiogenesis};
     
     \draw [arrow] (input) -- (pred);
     \draw [arrow] (pred) -- (shap);
