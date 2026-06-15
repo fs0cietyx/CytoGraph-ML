@@ -213,11 +213,11 @@ graph LR
 During the engineering lifecycle of this project, several critical issues were identified and patched to transition the pipeline into a hardened clinical tool:
 
 ### 4.1 Development Progression Audit
-The following audit logs summarize the three core vulnerabilities identified in the initial framework and resolved via the APEX Protocol:
+The following audit logs summarize the three core vulnerabilities identified in the initial framework and resolved via the clinical hardening:
 
 **Table 1: Development Progression Audit**
 
-| Vulnerability / Bottleneck | Cause | Impact | The Engineering Patch (APEX Protocol) |
+| Vulnerability / Bottleneck | Cause | Impact | The Engineering Patch (clinical hardening) |
 |---|---|---|---|
 | **Data Leakage** | Feature selection and scaling fit globally on the entire dataset *before* validation splitting. | Overly optimistic validation scores ($\sim 100\%$); poor clinical generalization. | Encapsulated all steps inside `sklearn.pipeline.Pipeline` with `VarianceThreshold(0.01)`. Fit operations are restricted to training folds. |
 | **Adversarial NaNs** | Raw genetic sequencers occasionally fail, leaving blank or missing read-count cells. | Model crashed with `ValueError: Input contains NaN` during clinical run. | Integrated `SimpleImputer(strategy='median')` immediately after variance thresholding to fill blanks based on training fold medians. |
