@@ -4,7 +4,7 @@ from typing import Tuple, List
 from .config import logger, config
 
 class BioDataLoader:
-    """Enterprise Data Ingestion Layer for Biological Datasets."""
+    """Clinical Data Ingestion Layer for Biological Datasets."""
     
     def __init__(self):
         self.features_path = config.FEATURES_PATH
