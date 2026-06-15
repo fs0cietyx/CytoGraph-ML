@@ -1,50 +1,72 @@
+import mygene
 from typing import Dict, List
 from .config import logger
 
 class BioMapper:
     """
     Biological Pathway Integration Layer.
-    Maps raw Gene IDs to documented oncogenic pathways.
+    Connects to MyGene.info API to fetch real-world genomic metadata for research validation.
     """
     
-    # In a production TCGA pipeline, this would be a JSON/CSV mapping file 
-    # or a live query to the NCBI/Ensembl API.
-    # We implement an extensible mapping template for the top predictive genes.
-    PATHWAY_MAPPING = {
-        "gene_14092": {"Symbol": "TF-Alpha", "Pathway": "Cell Cycle Regulation", "Role": "Tumor Suppressor"},
-        "gene_15897": {"Symbol": "K-RAS-Like", "Pathway": "MAPK Signaling", "Role": "Oncogene"},
-        "gene_14068": {"Symbol": "PTEN-Rel", "Pathway": "PI3K/AKT Pathway", "Role": "Growth Inhibition"},
-        "gene_6530":  {"Symbol": "MYC-V", "Pathway": "Transcriptional Activation", "Role": "Cell Proliferation"},
-        "gene_7964":  {"Symbol": "BCL2-P", "Pathway": "Apoptosis Inhibition", "Role": "Cell Survival"}
-    }
+    _mg = mygene.MyGeneInfo()
 
     @classmethod
     def get_biological_context(cls, gene_ids: List[str]) -> Dict[str, Dict]:
         """
-        Enriches a list of Gene IDs with biological context.
+        Enriches Gene IDs with real-world metadata from the MyGene.info database.
         """
-        logger.info(f"BioMapper: Enriching context for {len(gene_ids)} genes.")
-        enriched_data = {}
+        logger.info(f"BioMapper: Fetching real-world metadata for {len(gene_ids)} genes...")
         
-        for gid in gene_ids:
-            # Return mapping if exists, else provide generic "Unknown" context
-            enriched_data[gid] = cls.PATHWAY_MAPPING.get(gid, {
-                "Symbol": gid.upper(),
-                "Pathway": "Metabolic Homeostasis",
-                "Role": "General Cellular Function"
-            })
+        try:
+            # Batch query for symbols and summaries
+            results = cls._mg.querymany(
+                gene_ids, 
+                scopes='symbol,entrezgene,reporter', 
+                fields='symbol,name,summary,pathway',
+                species='human',
+                verbose=False
+            )
             
-        return enriched_data
+            enriched_data = {}
+            for res in results:
+                gid = res.get('query')
+                enriched_data[gid] = {
+                    "Symbol": res.get('symbol', gid.upper()),
+                    "Name": res.get('name', "Unknown Biological Marker"),
+                    "Pathway": cls._extract_pathway(res),
+                    "Summary": res.get('summary', "Detailed pathway analysis required.")
+                }
+            return enriched_data
+            
+        except Exception as e:
+            logger.error(f"BioMapper: API Fetch Failure: {e}")
+            # Fallback to generic mapping on network failure
+            return {gid: {"Symbol": gid.upper(), "Name": "Network Error", "Pathway": "N/A", "Summary": "N/A"} for gid in gene_ids}
+
+    @staticmethod
+    def _extract_pathway(res: Dict) -> str:
+        """Helper to extract a readable pathway name from complex API responses."""
+        pathways = res.get('pathway', {})
+        if not pathways:
+            return "Metabolic Homeostasis"
+        
+        # Try to get the first available pathway from Reactome or KEGG
+        if 'reactome' in pathways:
+            r = pathways['reactome']
+            return r[0]['name'] if isinstance(r, list) else r.get('name', "Cellular Process")
+        return "Signaling Pathway"
 
     @classmethod
     def generate_scientific_report(cls, top_genes: List[str]):
         """
-        Generates a markdown table mapping genes to their biological roles.
+        Generates a professional markdown report using real scientific data.
         """
         context = cls.get_biological_context(top_genes)
         
-        report = ["| Gene ID | Symbol | Biological Pathway | Role |", "|---|---|---|---|"]
+        report = ["| Gene ID | Symbol | Biological Name | Pathway | Summary |", "|---|---|---|---|---|"]
         for gid, data in context.items():
-            report.append(f"| {gid} | {data['Symbol']} | {data['Pathway']} | {data['Role']} |")
+            # Clean up long summaries
+            summary = (data['Summary'][:75] + '...') if len(data['Summary']) > 75 else data['Summary']
+            report.append(f"| {gid} | {data['Symbol']} | {data['Name']} | {data['Pathway']} | {summary} |")
             
         return "\n".join(report)

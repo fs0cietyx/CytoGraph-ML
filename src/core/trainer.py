@@ -11,18 +11,37 @@ import joblib
 from typing import Dict, Any
 from .config import logger, config
 
-class APEXTrainer:
-    """Enterprise ML Trainer with Stratified Validation, Anti-Leakage Pipelines & Deterministic Locking."""
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GroupKFold, cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.feature_selection import SelectKBest, mutual_info_classif
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import RobustScaler
+import joblib
+from typing import Dict, Any
+from .config import logger, config
+
+class GenomicResearchTrainer:
+    """
+    High-Integrity Research Trainer.
+    Implements Group-Blind Validation and Biological Proxy Filtering.
+    """
     
     def __init__(self):
         self.config = config
         
-        # DEFENSIVE PATCH: Impenetrable Pipeline
-        # Ensures imputation, scaling, and feature selection are fitted ONLY on training folds.
+        # PROXY FILTER: Blacklist of non-specific biological markers
+        # These genes are 'smoke' (inflammation/blood vessels) that mask real oncogenesis.
+        self.biological_blacklist = [
+            'VWF', 'PECAM1', 'CD34', 'ENG', 'CDH5', # Endothelial/Blood Vessel markers
+            'IL6', 'TNF', 'CRP', 'CCL2', 'IL8',     # General Inflammation
+            'ACTB', 'GAPDH', 'B2M', 'ALB'          # Housekeeping/Stroma
+        ]
+        
         self.pipeline = Pipeline([
-            ('variance_filter', VarianceThreshold(threshold=config.VARIANCE_THRESHOLD)),
-            ('imputer', SimpleImputer(strategy='median')), # Handles sparse/NaN adversarial inputs
-            ('scaler', RobustScaler()), # Handles extreme biological outliers
+            ('imputer', SimpleImputer(strategy='median')),
+            ('scaler', RobustScaler()),
+            ('feature_selector', SelectKBest(score_func=mutual_info_classif, k=250)),
             ('rf', RandomForestClassifier(
                 n_estimators=config.RF_ESTIMATORS,
                 max_features=config.RF_MAX_FEATURES,
@@ -31,50 +50,51 @@ class APEXTrainer:
             ))
         ])
 
-    def execute_stratified_training(self, X: pd.DataFrame, y: pd.Series) -> Dict[str, Any]:
+    def execute_stratified_training(self, X: pd.DataFrame, y: pd.Series, groups=None) -> Dict[str, Any]:
         """
-        Executes N-Fold Stratified Cross-Validation and final pipeline fitting.
+        Executes Group-Blind N-Fold Cross-Validation.
+        Ensures patients are NEVER split across train/test boundaries.
         """
-        logger.info(f"Initiating Stratified {config.N_FOLD}-Fold Cross-Validation...")
+        # 1. Apply Biological Filter
+        logger.info(f"Applying Biological Filter: Removing {len(self.biological_blacklist)} proxy markers...")
+        X_filtered = X.drop(columns=[g for g in self.biological_blacklist if g in X.columns])
         
-        skf = StratifiedKFold(n_splits=config.N_FOLD, shuffle=True, random_state=config.RANDOM_STATE)
+        # 2. Group-Blind Validation
+        logger.info(f"Initiating Group-Blind {config.N_FOLD}-Fold Cross-Validation...")
+        gkf = GroupKFold(n_splits=config.N_FOLD)
         
-        # Cross-validation is now leakage-free because the pipeline fits per fold
-        scores = cross_val_score(self.pipeline, X, y, cv=skf, scoring='accuracy')
+        y_numeric = np.array(y).astype(int)
         
-        logger.info(f"CV Accuracy Scores: {scores}")
-        logger.info(f"Mean CV Accuracy: {np.mean(scores):.4f} (+/- {np.std(scores):.4f})")
+        # Perform CV with Group awareness
+        scores = cross_val_score(
+            self.pipeline, X_filtered, y_numeric, 
+            cv=gkf, groups=groups, scoring='accuracy'
+        )
         
-        # Final Fit on entire training set
-        logger.info("Fitting final production pipeline...")
-        self.pipeline.fit(X, y)
+        logger.info(f"Honest CV Accuracy Scores: {scores}")
+        logger.info(f"Mean Honest Accuracy: {np.mean(scores):.4f} (+/- {np.std(scores):.4f})")
         
-        # Save original feature names to the pipeline for later mapping
-        self.original_features = X.columns
+        # 3. Final Fit
+        logger.info("Fitting final scientifically-hardened pipeline...")
+        self.pipeline.fit(X_filtered, y_numeric)
+        
+        self.original_features = X_filtered.columns
         
         # Serialization
         model_path = config.MODEL_DIR / "final_pipeline.joblib"
         joblib.dump(self.pipeline, model_path)
         
-        # Persist base features for API schema validation
-        feature_list_path = config.MODEL_DIR / "base_features.joblib"
-        joblib.dump(self.original_features.tolist(), feature_list_path)
-        
-        logger.info(f"Production pipeline serialized to {model_path}")
-        
         return {
             "mean_cv_accuracy": np.mean(scores),
-            "std_cv_accuracy": np.std(scores),
             "model_path": model_path
         }
 
     def get_feature_importance(self) -> pd.DataFrame:
-        """Extracts Gini importance mapping back through the VarianceThreshold mask."""
+        """Extracts Gini importance mapping back through the SelectKBest mask."""
         rf_model = self.pipeline.named_steps['rf']
-        var_filter = self.pipeline.named_steps['variance_filter']
+        selector = self.pipeline.named_steps['feature_selector']
         
-        # Get the mask of features that survived the variance threshold
-        surviving_features_mask = var_filter.get_support()
+        surviving_features_mask = selector.get_support()
         surviving_feature_names = self.original_features[surviving_features_mask]
         
         importances = rf_model.feature_importances_

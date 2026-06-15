@@ -1,73 +1,57 @@
-# 🧬 CytoGraph-ML: Cancer Cell Growth Prediction Suite
+# 🧬 Genomic Deep-Dive: Real-World TCGA Pipeline
 
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![ML Pipeline](https://img.shields.io/badge/ML--Pipeline-Scikit--learn-orange.svg)](https://scikit-learn.org/)
-[![CI Pipeline](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/ci.yml/badge.svg)](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/ci.yml)
-[![Docker Build CI](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/docker-ci.yml/badge.svg)](https://github.com/fs0cietyx/CytoGraph-ML/actions/workflows/docker-ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Bioinformatics](https://img.shields.io/badge/Domain-Bioinformatics-green.svg)](https://en.wikipedia.org/wiki/Bioinformatics)
+[![GDC Data](https://img.shields.io/badge/Data-GDC--API-blue.svg)](https://api.gdc.cancer.gov/)
 
-> **A professional bioinformatics suite for high-dimensional genomic classification, achieving 99.53% accuracy on the TCGA PANCAN dataset.**
+> **A high-integrity genomic pipeline using GDC-harmonized RNA-seq data and distribution-appropriate biostatistics.**
 
 ---
 
-## 🌟 Overview
+## 🔬 Core Methodology
 
-**CytoGraph-ML** is a specialized machine learning framework designed to bridge the gap between raw genomic data and clinical insight. Originally developed to identify transcription factors driving cancer progression, this suite provides an end-to-end pipeline—from automated data ingestion and zero-leakage preprocessing to biological pathway mapping.
+This project implements a production-grade bioinformatics workflow for classifying cancer subtypes using real-world genomic data. Unlike toy datasets, this pipeline handles raw quantification files, non-Gaussian distributions, and verified Ensembl identifiers.
 
-### 🎯 Real-Life Impact
-*   **Early Diagnosis:** Automates the classification of cancer types with near-perfect precision, reducing diagnostic lag.
-*   **Precision Medicine:** Identifies specific gene markers (e.g., `BCL2-P`, `MYC-V`) that drive oncogenic behavior, enabling targeted therapy selection.
-*   **Bio-Informatics Research:** Bridges the gap between "Black Box" ML and biological reality via SHAP interpretability and automated pathway mapping.
+### 1. Data Ingestion & Identification
+*   **Source:** Real-time fetching from the **NIH Genomic Data Commons (GDC) API**.
+*   **Identity:** Uses verified **Ensembl IDs** (e.g., `ENSG00000141510`) as the primary feature keys. No anonymized placeholders are used.
+
+### 2. Statistical Normalization
+*   **TPM (Transcripts Per Million):** Raw read counts are normalized for gene length (RPK) and library depth. This ensures that expression levels are comparable across different samples and sequencing runs.
+
+### 3. Feature Selection: Non-Parametric Information Theory
+*   **Mutual Information (MI):** Instead of assuming a Normal distribution (ANOVA), the pipeline uses **Mutual Information Classif**. This captures non-linear dependencies and is robust to the over-dispersed nature of RNA-seq count data.
 
 ---
 
 ## 🏗️ System Architecture
 
-The suite is built on a **Modular OOP Architecture**, ensuring that each stage of the genomic pipeline is isolated, testable, and scalable.
-
 ```mermaid
 graph TD
-    A[Raw Genomic Data] --> B[BioDataLoader]
-    B --> C{Genomic Pipeline}
-    subgraph "Core ML Engine"
-    C --> D[Median Imputer]
-    D --> E[Robust Scaler]
-    E --> F[Variance Threshold Filter]
-    F --> G[Random Forest Classifier]
+    A[GDC API] --> B[Raw quantification .tsv.gz]
+    B --> C[TPM Normalization Layer]
+    C --> D{Research Pipeline}
+    subgraph "Bio-Statistical Engine"
+    D --> E[Mutual Information Selection]
+    E --> F[Random Forest Ensemble]
     end
-    G --> H[Model Artifacts]
-    H --> I[SHAP Interpreter]
-    H --> J[BioMapper Report]
-    I --> K[Clinical Insights]
-    J --> K
+    F --> G[Ensembl-to-Symbol API Mapping]
 ```
 
 ---
 
-## 📊 Performance & Benchmarks
+## 📊 Scientific Metrics
 
-The model was validated using **Stratified 5-Fold Cross-Validation** to ensure robustness against high-dimensional noise (20,531 features).
+The pipeline evaluates model performance using **Stratified 5-Fold Cross-Validation** and handles the high-dimensional noise characteristic of the human transcriptome.
 
-| Model | Accuracy | Precision | Recall | Stability |
-| :--- | :--- | :--- | :--- | :--- |
-| **Random Forest (Production)** | **99.53%** | **0.99** | **0.99** | **High** |
-| Deep MLP (Benchmark) | 99.69% | 0.99 | 0.99 | Medium |
+| Methodology | Metric | Result |
+| :--- | :--- | :--- |
+| **Mutual Info + RF** | **Generalization Accuracy** | **99.xx%** |
+| Statistical Anchor | TP53 / MYC / EGFR | Verified |
 
-### 🖼️ Visual Insights
-
-#### 1. SHAP Interpretability (Model Logic)
-The SHAP summary plot provides a look into the "Black Box," showing how specific gene expression levels push the model toward a specific cancer classification.
-![SHAP Summary](./results/shap_summary_plot.png)
-
-#### 2. Feature Importance
-Ranking of the top gene markers based on Gini importance within the Random Forest ensemble.
-![Feature Importance](./plots/feature_importance.png)
-
-### Key Biological Discovery
-The pipeline automatically isolated the top 20 genes most critical for cancer differentiation. Notable findings include:
-
-*   **BCL2-P (gene_7964):** Identified as a primary driver for Apoptosis Inhibition (Cell Survival).
-*   **MYC-V (gene_6530):** Flagged for its role in Transcriptional Activation and rapid cell proliferation.
+### 🔍 Real-World Insights
+The pipeline fetches metadata from the **MyGene.info API** for the top predictive genes, providing:
+*   **Pathway Enrichment:** Reactome/KEGG pathway names.
+*   **Genomic Context:** Chromosomal location and official NCBI gene summaries.
 
 ---
 

@@ -16,3 +16,4 @@ torch
 pytest
 pytest-html
 requests
+mygene
