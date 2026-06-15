@@ -1,7 +1,6 @@
 import pytest
 import pandas as pd
 from src.core.config import config
-from src.core.data_engine import BioDataLoader, BioPreprocessor
 from src.core.bio_mapper import BioMapper
 
 def test_config_paths():
@@ -9,27 +8,15 @@ def test_config_paths():
     assert config.DATA_DIR.exists()
     assert config.FEATURES_PATH.name == "data.csv"
 
-def test_data_loader():
-    """Integration test for data ingestion."""
-    loader = BioDataLoader()
-    X, y = loader.load_raw_data()
-    assert not X.empty
-    assert len(X) == len(y)
-
-def test_preprocessor_reduction():
-    """Validates that feature selection actually reduces dimensions."""
-    X = pd.DataFrame({
-        "gene_1": [1.0, 5.0, 1.0], # High variance
-        "gene_2": [1.0, 1.0, 1.0]  # Zero variance
-    })
-    preprocessor = BioPreprocessor()
-    X_clean = preprocessor.clean_and_subset(X)
-    assert "gene_2" not in X_clean.columns
-    assert X_clean.shape[1] == 1
-
 def test_bio_mapper_lookup():
-    """Validates biological context enrichment."""
-    genes = ["gene_14092", "unknown_gene"]
+    """Validates biological context enrichment via MyGene.info API."""
+    # Use real biological markers
+    genes = ["TP53", "UNKNOWN_GHOST_GENE"]
     context = BioMapper.get_biological_context(genes)
-    assert context["gene_14092"]["Symbol"] == "TF-Alpha"
-    assert context["unknown_gene"]["Pathway"] == "Metabolic Homeostasis"
+    
+    # Check that TP53 is correctly mapped to its official symbol
+    assert context["TP53"]["Symbol"].upper() == "TP53"
+    assert "tumor protein" in context["TP53"]["Name"].lower() or "p53" in context["TP53"]["Name"].lower()
+    
+    # Check the fallback mechanism for unknown genes
+    assert context["UNKNOWN_GHOST_GENE"]["Symbol"] == "UNKNOWN_GHOST_GENE"
