@@ -30,7 +30,7 @@ class PipelineConfig(BaseModel):
     VARIANCE_THRESHOLD: float = 0.01
 
 def setup_logging():
-    """Configures the enterprise logging suite."""
+    """Configures the standard research logging suite."""
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(
         level=logging.INFO,
@@ -40,7 +40,7 @@ def setup_logging():
             logging.FileHandler("pipeline.log")
         ]
     )
-    return logging.getLogger("APEX-Pipeline")
+    return logging.getLogger("Genomic-Pipeline")
 
 # Initialize global config and logger
 config = PipelineConfig()
